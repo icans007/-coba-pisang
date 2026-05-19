@@ -30,19 +30,26 @@ if (themeToggle) {
 initTheme();
 
 // ── Sidebar Toggle (Mobile) ────────────────────────────────────
-const sidebarToggleBtn = document.getElementById('sidebar-toggle');
-const sidebar   = document.getElementById('sidebar');
-const overlay   = document.getElementById('sidebar-overlay');
+const sidebarToggle = document.querySelector('.sidebar-toggle');
+const sidebar = document.querySelector('.sidebar');
+const overlay = document.querySelector('.sidebar-overlay');
 
-if (sidebarToggleBtn && sidebar) {
-  sidebarToggleBtn.addEventListener('click', () => {
-    sidebar.classList.toggle('open');
-    overlay.classList.toggle('show');
-  });
-  overlay.addEventListener('click', () => {
-    sidebar.classList.remove('open');
-    overlay.classList.remove('show');
-  });
+if(sidebarToggle){
+
+    sidebarToggle.addEventListener('click', () => {
+        sidebar.classList.toggle('open');
+        overlay.classList.toggle('show');
+    });
+
+}
+
+if(overlay){
+
+    overlay.addEventListener('click', () => {
+        sidebar.classList.remove('open');
+        overlay.classList.remove('show');
+    });
+
 }
 
 // ── Active Nav Link ────────────────────────────────────────────
@@ -51,6 +58,41 @@ document.querySelectorAll('.sidebar-nav a, .navbar-nav a').forEach(a => {
       window.location.pathname.startsWith(a.getAttribute('href')) && a.getAttribute('href') !== '/') {
     a.classList.add('active');
   }
+});
+
+document.addEventListener('DOMContentLoaded', () => {
+
+    const menuToggle = document.getElementById('menuToggle');
+    const sidebar = document.getElementById('mobileSidebar');
+    const overlay = document.getElementById('sidebarOverlay');
+    const closeSidebar = document.getElementById('closeSidebar');
+
+    // OPEN SIDEBAR
+    menuToggle.addEventListener('click', () => {
+
+        sidebar.classList.add('open');
+        overlay.classList.add('show');
+
+        document.body.style.overflow = 'hidden';
+
+    });
+
+    // CLOSE FUNCTION
+    function closeMenu(){
+
+        sidebar.classList.remove('open');
+        overlay.classList.remove('show');
+
+        document.body.style.overflow = '';
+
+    }
+
+    // CLOSE BUTTON
+    closeSidebar.addEventListener('click', closeMenu);
+
+    // CLICK OVERLAY
+    overlay.addEventListener('click', closeMenu);
+
 });
 
 // ── Toast Notification ─────────────────────────────────────────

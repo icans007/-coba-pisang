@@ -11,26 +11,135 @@
 </head>
 <body>
 
-<!-- ── NAVBAR ── -->
+<!-- NAVBAR -->
 <nav class="navbar">
-  <a href="/" class="navbar-brand">
-    <div class="brand-icon">🍌</div>
-    <span>BananaDetect</span>
-  </a>
-  <ul class="navbar-nav">
-    <li><a href="/">Beranda</a></li>
-    <li><a href="/dashboard">Dashboard</a></li>
-    <li><a href="/predict">Prediksi</a></li>
-    <li><a href="/training">Training</a></li>
-    <li><a href="/evaluation">Evaluasi</a></li>
-    <li><a href="/about">Tentang</a></li>
-  </ul>
-  <div class="navbar-right">
-    <button class="btn-theme" id="theme-toggle" title="Toggle Theme">🌙</button>
-    <a href="/predict" class="btn btn-accent btn-sm">Coba Sekarang</a>
-  </div>
+
+    <!-- LOGO -->
+    <a href="/" class="navbar-brand">
+
+        <div class="brand-icon">
+            🍌
+        </div>
+
+        <span>BananaDetect</span>
+
+    </a>
+
+    <!-- DESKTOP MENU -->
+    <ul class="navbar-nav">
+
+        <li>
+            <a href="/">Beranda</a>
+        </li>
+
+        <li>
+            <a href="/dashboard">Dashboard</a>
+        </li>
+
+        <li>
+            <a href="/predict">Prediksi</a>
+        </li>
+
+        <li>
+            <a href="/training">Training</a>
+        </li>
+
+        <li>
+            <a href="/evaluation">Evaluasi</a>
+        </li>
+
+        <li>
+            <a href="/about">Tentang</a>
+        </li>
+
+    </ul>
+
+    <!-- RIGHT -->
+    <div class="navbar-right">
+
+        <!-- THEME -->
+        <button
+            class="btn-theme"
+            id="theme-toggle"
+            type="button"
+            aria-label="Toggle Theme"
+        >
+            🌙
+        </button>
+
+        <!-- MOBILE MENU -->
+        <button
+            id="menuToggle"
+            class="sidebar-toggle"
+            type="button"
+            aria-label="Open Menu"
+        >
+            ☰
+        </button>
+
+        <!-- CTA -->
+        <a href="/predict" class="btn btn-accent btn-sm">
+            Coba Sekarang
+        </a>
+
+    </div>
+
 </nav>
 
+<!-- OVERLAY -->
+<div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+<!-- SIDEBAR -->
+<div class="sidebar" id="mobileSidebar">
+
+    <!-- HEADER -->
+    <div class="sidebar-header">
+
+        <div class="sidebar-logo">
+            🍌 BananaDetect
+        </div>
+
+        <button
+            id="closeSidebar"
+            class="close-sidebar"
+            type="button"
+            aria-label="Close Menu"
+        >
+            ✕
+        </button>
+
+    </div>
+
+    <!-- MENU -->
+    <div class="sidebar-menu">
+
+        <a href="/">
+            🏠 Beranda
+        </a>
+
+        <a href="/dashboard">
+            📊 Dashboard
+        </a>
+
+        <a href="/predict">
+            🔍 Prediksi
+        </a>
+
+        <a href="/training">
+            🧠 Training
+        </a>
+
+        <a href="/evaluation">
+            📈 Evaluasi
+        </a>
+
+        <a href="/about">
+            ℹ️ Tentang
+        </a>
+
+    </div>
+
+</div>
 <!-- ── HERO ── -->
 <section class="hero">
   <div class="hero-bg"></div>
@@ -331,5 +440,6 @@
 
 <div id="toast-container" class="toast-container"></div>
 <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+
 </body>
 </html>
