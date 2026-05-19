@@ -8,7 +8,7 @@ Flask==3.0.0
 Werkzeug==3.0.1
 
 # Deep Learning
-tensorflow-cpu==2.14.0
+tensorflow==2.16.1
 keras==2.14.0
 
 # Computer Vision
