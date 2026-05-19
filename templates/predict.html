@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="id" data-theme="light">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Prediksi – BananaDetect</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+
+<nav class="navbar">
+  <a href="/" class="navbar-brand"><div class="brand-icon">🍌</div><span>BananaDetect</span></a>
+  <div class="navbar-right">
+    <button class="btn-theme sidebar-toggle" id="sidebar-toggle">☰</button>
+    <button class="btn-theme" id="theme-toggle">🌙</button>
+    <a href="/predict" class="btn btn-accent btn-sm">Prediksi</a>
+  </div>
+</nav>
+
+<div class="sidebar-overlay" id="sidebar-overlay"></div>
+<div class="app-layout">
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-section">
+      <div class="sidebar-label">Menu Utama</div>
+      <ul class="sidebar-nav">
+        <li><a href="/dashboard"><span class="nav-icon">📊</span> Dashboard</a></li>
+        <li><a href="/predict" class="active"><span class="nav-icon">🍌</span> Prediksi</a></li>
+        <li><a href="/training"><span class="nav-icon">🏋️</span> Training Model</a></li>
+        <li><a href="/evaluation"><span class="nav-icon">📈</span> Evaluasi</a></li>
+        <li><a href="/comparison"><span class="nav-icon">⚖️</span> Perbandingan</a></li>
+      </ul>
+    </div>
+    <div class="sidebar-section">
+      <div class="sidebar-label">Informasi</div>
+      <ul class="sidebar-nav">
+        <li><a href="/about"><span class="nav-icon">📖</span> Tentang Riset</a></li>
+        <li><a href="/"><span class="nav-icon">🏠</span> Beranda</a></li>
+      </ul>
+    </div>
+  </aside>
+
+  <main class="main-content">
+    <div class="page-header">
+      <h1>Prediksi Kematangan Pisang</h1>
+      <p>Upload foto pisang dan pilih model AI untuk mendapatkan hasil klasifikasi real-time.</p>
+    </div>
+
+    <div class="grid-2">
+      <!-- UPLOAD COLUMN -->
+      <div>
+        <!-- Model Selection -->
+        <div class="card mb-4">
+          <div class="card-title">🤖 Pilih Model AI</div>
+          <div class="model-tabs">
+            <button class="model-tab active" data-model="resnet50">ResNet50</button>
+            <button class="model-tab" data-model="vgg16">VGG16</button>
+          </div>
+          <div style="display:flex;gap:1.5rem;flex-wrap:wrap">
+            <div>
+              <div style="font-size:0.75rem;color:var(--gray-400);margin-bottom:2px">Akurasi</div>
+              <div id="model-accuracy" style="font-size:1rem;font-weight:600;color:var(--gray-900)">93.7%</div>
+            </div>
+            <div>
+              <div style="font-size:0.75rem;color:var(--gray-400);margin-bottom:2px">F1-Score</div>
+              <div id="model-f1" style="font-size:1rem;font-weight:600;color:var(--gray-900)">93.3%</div>
+            </div>
+            <div>
+              <div style="font-size:0.75rem;color:var(--gray-400);margin-bottom:2px">Ukuran Model</div>
+              <div id="model-size" style="font-size:1rem;font-weight:600;color:var(--gray-900)">~98 MB</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Upload Form -->
+        <form id="upload-form" enctype="multipart/form-data">
+          <!-- Upload Zone -->
+          <div class="upload-zone" id="upload-zone">
+            <input type="file" id="file-input" name="file" accept=".jpg,.jpeg,.png,.webp">
+            <div class="upload-icon">📷</div>
+            <div class="upload-title">Drag & Drop gambar di sini</div>
+            <p class="upload-sub">atau <span>klik untuk memilih file</span></p>
+            <p class="upload-sub" style="margin-top:0.5rem">JPG, PNG, WEBP · Maks. 10 MB</p>
+          </div>
+
+          <!-- Camera Button -->
+          <div style="display:flex;align-items:center;gap:0.75rem;margin:0.75rem 0">
+            <div style="flex:1;height:1px;background:var(--gray-100)"></div>
+            <span style="font-size:0.75rem;color:var(--gray-400)">atau</span>
+            <div style="flex:1;height:1px;background:var(--gray-100)"></div>
+          </div>
+          <button type="button" id="open-camera-btn" class="btn btn-outline w-full" style="justify-content:center;gap:0.5rem;padding:11px">
+            <span>📸</span> Gunakan Kamera
+          </button>
+
+          <!-- Camera Modal -->
+          <div id="camera-modal" style="display:none;position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,0.85);align-items:center;justify-content:center;padding:1rem">
+            <div style="background:var(--surface);border-radius:var(--radius-xl);width:100%;max-width:520px;overflow:hidden;box-shadow:0 25px 50px rgba(0,0,0,0.3)">
+              <!-- Modal Header -->
+              <div style="display:flex;align-items:center;justify-content:space-between;padding:1.25rem 1.5rem;border-bottom:1px solid var(--gray-100)">
+                <div style="font-size:1rem;font-weight:600;color:var(--gray-900)">📸 Kamera Langsung</div>
+                <button id="close-camera-btn" type="button" class="btn btn-ghost btn-sm" style="color:var(--gray-400);padding:4px 8px">✕ Tutup</button>
+              </div>
+              <!-- Video Stream -->
+              <div style="position:relative;background:#000;aspect-ratio:4/3;overflow:hidden">
+                <video id="camera-video" autoplay playsinline muted style="width:100%;height:100%;object-fit:cover"></video>
+                <canvas id="camera-canvas" style="display:none"></canvas>
+                <!-- Guide frame -->
+                <div style="position:absolute;inset:0;pointer-events:none;display:flex;align-items:center;justify-content:center">
+                  <div style="width:55%;aspect-ratio:1;border:2px dashed rgba(255,255,255,0.45);border-radius:12px"></div>
+                </div>
+                <!-- Switch camera button -->
+                <button id="switch-camera-btn" type="button" style="position:absolute;top:12px;right:12px;background:rgba(0,0,0,0.55);border:none;border-radius:50%;width:40px;height:40px;cursor:pointer;font-size:1.1rem;display:flex;align-items:center;justify-content:center;color:#fff" title="Ganti Kamera">🔄</button>
+                <!-- Loading state -->
+                <div id="camera-loading" style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;background:#000;color:#fff;gap:0.75rem">
+                  <div style="width:36px;height:36px;border:3px solid rgba(255,255,255,0.2);border-top-color:#fff;border-radius:50%;animation:spin 0.8s linear infinite"></div>
+                  <span style="font-size:0.85rem">Memuat kamera...</span>
+                </div>
+                <!-- Error state -->
+                <div id="camera-error" style="display:none;position:absolute;inset:0;flex-direction:column;align-items:center;justify-content:center;background:#1a1a1a;color:#fff;gap:0.75rem;padding:2rem;text-align:center">
+                  <span style="font-size:2.5rem">📵</span>
+                  <div style="font-size:0.95rem;font-weight:600">Kamera tidak dapat diakses</div>
+                  <div id="camera-error-msg" style="font-size:0.8rem;color:rgba(255,255,255,0.6)">Pastikan izin kamera sudah diberikan di browser Anda.</div>
+                </div>
+                <!-- Countdown overlay -->
+                <div id="camera-countdown-overlay" style="display:none;position:absolute;inset:0;align-items:center;justify-content:center;background:rgba(0,0,0,0.4)">
+                  <div id="camera-countdown-num" style="font-size:5rem;font-weight:700;color:#fff;text-shadow:0 2px 16px rgba(0,0,0,0.5)"></div>
+                </div>
+                <!-- Flash effect -->
+                <div id="camera-flash" style="display:none;position:absolute;inset:0;background:#fff;opacity:0;transition:opacity 0.15s"></div>
+              </div>
+              <!-- Controls -->
+              <div style="padding:1.25rem 1.5rem">
+                <div style="display:flex;gap:0.75rem">
+                  <button id="capture-btn" type="button" class="btn btn-primary" style="flex:1;justify-content:center;gap:0.5rem">
+                    <span>📸</span> Ambil Foto
+                  </button>
+                  <select id="camera-timer" style="border:1px solid var(--gray-200);border-radius:var(--radius-md);padding:0 0.75rem;background:var(--surface);color:var(--gray-700);font-size:0.85rem;cursor:pointer;min-width:110px">
+                    <option value="0">Tanpa Timer</option>
+                    <option value="3">Timer 3 dtk</option>
+                    <option value="5">Timer 5 dtk</option>
+                    <option value="10">Timer 10 dtk</option>
+                  </select>
+                </div>
+                <p style="font-size:0.75rem;color:var(--gray-400);margin-top:0.75rem;text-align:center">💡 Arahkan pisang ke tengah bingkai untuk hasil terbaik</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Image Preview -->
+          <div class="img-preview-wrap mb-4" id="img-preview-wrap">
+            <img id="preview-img" src="" alt="Preview">
+            <div class="img-preview-bar">
+              <div>
+                <div class="img-preview-name" id="preview-name">-</div>
+                <div class="img-preview-size" id="preview-size">-</div>
+              </div>
+              <button type="button" id="remove-img" class="btn btn-ghost btn-sm" style="color:var(--gray-400)">✕ Hapus</button>
+            </div>
+          </div>
+
+          <!-- Submit -->
+          <button type="submit" id="predict-btn" class="btn btn-primary w-full" style="justify-content:center;padding:13px;" disabled>
+            <span>🔍</span> Analisis Gambar
+          </button>
+        </form>
+      </div>
+
+      <!-- RESULT COLUMN -->
+      <div>
+        <!-- Default empty state -->
+        <div id="result-empty" style="height:100%;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:1rem;color:var(--gray-300);text-align:center;padding:3rem;border:2px dashed var(--gray-100);border-radius:var(--radius-xl)">
+          <span style="font-size:3rem">🍌</span>
+          <p style="font-size:0.9rem">Hasil prediksi akan muncul di sini setelah Anda mengupload gambar dan menekan tombol Analisis.</p>
+        </div>
+
+        <!-- Result Card (hidden until prediction) -->
+        <div class="result-card" id="result-section" style="display:none">
+          <div class="result-header">
+            <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:0.75rem">
+              <div>
+                <div style="font-size:0.75rem;color:var(--gray-400);margin-bottom:6px">Hasil Klasifikasi</div>
+                <span class="result-label-tag ripe" id="result-label">Ripe</span>
+              </div>
+              <div style="text-align:right">
+                <div style="font-size:0.75rem;color:var(--gray-400);margin-bottom:4px">Confidence</div>
+                <div style="font-size:2rem;font-weight:700;color:var(--gray-900)" id="result-confidence">94.2%</div>
+              </div>
+            </div>
+            <div style="margin-top:0.75rem;display:flex;align-items:center;gap:8px;font-size:0.8rem;color:var(--gray-400)">
+              <span>Model:</span>
+              <span style="font-weight:600;color:var(--gray-700)" id="result-model">ResNet50</span>
+            </div>
+          </div>
+
+          <div style="padding:1.5rem">
+            <!-- Confidence Bars -->
+            <div style="font-size:0.8rem;font-weight:600;color:var(--gray-700);margin-bottom:1rem">Distribusi Probabilitas</div>
+            <div class="confidence-bar-wrap">
+              <div class="confidence-row">
+                <span class="confidence-name">Unripe</span>
+                <div class="confidence-bar-bg"><div class="confidence-bar-fill unripe" id="bar-unripe" style="width:0%"></div></div>
+                <span class="confidence-pct" id="pct-unripe">0%</span>
+              </div>
+              <div class="confidence-row">
+                <span class="confidence-name">Ripe</span>
+                <div class="confidence-bar-bg"><div class="confidence-bar-fill ripe" id="bar-ripe" style="width:0%"></div></div>
+                <span class="confidence-pct" id="pct-ripe">0%</span>
+              </div>
+              <div class="confidence-row">
+                <span class="confidence-name">Overripe</span>
+                <div class="confidence-bar-bg"><div class="confidence-bar-fill overripe" id="bar-overripe" style="width:0%"></div></div>
+                <span class="confidence-pct" id="pct-overripe">0%</span>
+              </div>
+            </div>
+
+            <!-- Info -->
+            <div style="background:var(--gray-25);border-radius:var(--radius-md);padding:1rem;border:1px solid var(--gray-100);margin-top:1rem">
+              <div style="font-size:0.8rem;font-weight:600;color:var(--gray-700);margin-bottom:0.75rem">Keterangan Kelas</div>
+              <div id="result-description" style="font-size:0.875rem;color:var(--gray-500);line-height:1.6">
+                Pisang dalam kondisi matang optimal, berwarna kuning cerah. Siap untuk dikonsumsi langsung.
+              </div>
+            </div>
+
+            <!-- Actions -->
+            <div style="display:flex;gap:8px;margin-top:1.25rem">
+              <button id="download-result" class="btn btn-outline btn-sm">⬇️ Unduh Hasil</button>
+              <button onclick="document.getElementById('remove-img').click()" class="btn btn-ghost btn-sm">🔄 Ulangi</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- HISTORY TABLE -->
+    <div class="card mt-6">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1.25rem">
+        <div class="card-title" style="margin-bottom:0">📋 Riwayat Prediksi</div>
+        <button id="clear-history" class="btn btn-ghost btn-sm" style="color:var(--gray-400)">Hapus Semua</button>
+      </div>
+      <div style="overflow-x:auto">
+        <table class="history-table">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Nama File</th>
+              <th>Kelas</th>
+              <th>Confidence</th>
+              <th>Waktu</th>
+            </tr>
+          </thead>
+          <tbody id="history-tbody">
+            <tr><td colspan="5" style="text-align:center;color:var(--gray-400);padding:2rem">Belum ada riwayat prediksi</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<div id="toast-container" class="toast-container"></div>
+<script src="{{ url_for('static', filename='js/script.js') }}"></script>
+<script>
+  // Model tab descriptions
+  const modelMeta = {
+    resnet50: { accuracy: '93.7%', f1: '93.3%', size: '~98 MB' },
+    vgg16:    { accuracy: '92.4%', f1: '92.0%', size: '~527 MB' }
+  };
+  document.querySelectorAll('.model-tab').forEach(tab => {
+    tab.addEventListener('click', () => {
+      const m = tab.dataset.model;
+      document.getElementById('model-accuracy').textContent = modelMeta[m].accuracy;
+      document.getElementById('model-f1').textContent = modelMeta[m].f1;
+      document.getElementById('model-size').textContent = modelMeta[m].size;
+    });
+  });
+
+  // Update result description based on label
+  function updateDescription(label) {
+    const descs = {
+      'Unripe':   'Pisang masih mentah, berwarna hijau dengan tekstur keras. Belum siap dikonsumsi langsung.',
+      'Ripe':     'Pisang dalam kondisi matang optimal, berwarna kuning cerah. Siap untuk dikonsumsi langsung.',
+      'Overripe': 'Pisang terlalu matang dengan warna coklat dan bintik hitam. Cocok untuk bahan kue atau olahan.'
+    };
+    const el = document.getElementById('result-description');
+    if (el) el.textContent = descs[label] || '-';
+
+    const empty = document.getElementById('result-empty');
+    if (empty) empty.style.display = 'none';
+  }
+
+  // Hook into displayResult
+  const origDisplay = window.displayResult;
+  window.displayResult = function(data) {
+    if (origDisplay) origDisplay(data);
+    updateDescription(data.label);
+  };
+</script>
+</body>
+</html>

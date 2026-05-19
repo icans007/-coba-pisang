@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="id" data-theme="light">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Perbandingan Model – BananaDetect</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js" defer></script>
+</head>
+<body>
+<nav class="navbar">
+  <a href="/" class="navbar-brand"><div class="brand-icon">🍌</div><span>BananaDetect</span></a>
+  <div class="navbar-right">
+    <button class="btn-theme sidebar-toggle" id="sidebar-toggle">☰</button>
+    <button class="btn-theme" id="theme-toggle">🌙</button>
+  </div>
+</nav>
+<div class="sidebar-overlay" id="sidebar-overlay"></div>
+<div class="app-layout">
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-section">
+      <div class="sidebar-label">Menu Utama</div>
+      <ul class="sidebar-nav">
+        <li><a href="/dashboard"><span class="nav-icon">📊</span> Dashboard</a></li>
+        <li><a href="/predict"><span class="nav-icon">🍌</span> Prediksi</a></li>
+        <li><a href="/training"><span class="nav-icon">🏋️</span> Training Model</a></li>
+        <li><a href="/evaluation"><span class="nav-icon">📈</span> Evaluasi</a></li>
+        <li><a href="/comparison" class="active"><span class="nav-icon">⚖️</span> Perbandingan</a></li>
+      </ul>
+    </div>
+    <div class="sidebar-section">
+      <div class="sidebar-label">Informasi</div>
+      <ul class="sidebar-nav">
+        <li><a href="/about"><span class="nav-icon">📖</span> Tentang Riset</a></li>
+        <li><a href="/"><span class="nav-icon">🏠</span> Beranda</a></li>
+      </ul>
+    </div>
+  </aside>
+
+  <main class="main-content">
+    <div class="page-header">
+      <h1>Perbandingan Model</h1>
+      <p>Analisis komparatif performa VGG16 vs ResNet50 pada dataset kematangan pisang.</p>
+    </div>
+
+    <!-- Winner Banner -->
+    <div style="background:linear-gradient(135deg,var(--green-50),var(--yellow-50));border:1px solid var(--green-200);border-radius:var(--radius-xl);padding:1.5rem 2rem;margin-bottom:2rem;display:flex;align-items:center;gap:1.5rem;flex-wrap:wrap">
+      <div style="font-size:2.5rem">🏆</div>
+      <div>
+        <div style="font-size:0.75rem;font-weight:600;color:var(--green-600);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:4px">Model Terbaik</div>
+        <div style="font-size:1.4rem;font-weight:700;color:var(--gray-900)">ResNet50 unggul dengan akurasi 93.7%</div>
+        <div style="font-size:0.875rem;color:var(--gray-500);margin-top:4px">Lebih akurat +1.3%, lebih ringan ~5x dibanding VGG16</div>
+      </div>
+      <div style="margin-left:auto">
+        <span class="badge-win">✓ Direkomendasikan</span>
+      </div>
+    </div>
+
+    <!-- Side-by-side metric cards -->
+    <div class="grid-2 mb-6">
+      <!-- VGG16 -->
+      <div class="card" style="border-color:var(--yellow-200)">
+        <div style="display:flex;align-items:center;gap:12px;margin-bottom:1.25rem">
+          <div style="width:44px;height:44px;border-radius:var(--radius-md);background:var(--yellow-100);display:flex;align-items:center;justify-content:center;font-size:22px">🏛️</div>
+          <div>
+            <div style="font-weight:700;font-size:1.1rem;color:var(--gray-900)">VGG16</div>
+            <div style="font-size:0.75rem;color:var(--gray-400)">Very Deep Convolutional Networks</div>
+          </div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem">
+          <div style="background:var(--gray-25);border-radius:var(--radius-md);padding:0.875rem;border:1px solid var(--gray-100)">
+            <div style="font-size:0.7rem;color:var(--gray-400);margin-bottom:4px">Accuracy</div>
+            <div style="font-size:1.4rem;font-weight:700;color:var(--yellow-600)">92.4%</div>
+          </div>
+          <div style="background:var(--gray-25);border-radius:var(--radius-md);padding:0.875rem;border:1px solid var(--gray-100)">
+            <div style="font-size:0.7rem;color:var(--gray-400);margin-bottom:4px">F1-Score</div>
+            <div style="font-size:1.4rem;font-weight:700;color:var(--yellow-600)">92.0%</div>
+          </div>
+          <div style="background:var(--gray-25);border-radius:var(--radius-md);padding:0.875rem;border:1px solid var(--gray-100)">
+            <div style="font-size:0.7rem;color:var(--gray-400);margin-bottom:4px">Model Size</div>
+            <div style="font-size:1.2rem;font-weight:600;color:var(--gray-700)">~527 MB</div>
+          </div>
+          <div style="background:var(--gray-25);border-radius:var(--radius-md);padding:0.875rem;border:1px solid var(--gray-100)">
+            <div style="font-size:0.7rem;color:var(--gray-400);margin-bottom:4px">Training Time</div>
+            <div style="font-size:1.2rem;font-weight:600;color:var(--gray-700)">~32 min</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ResNet50 -->
+      <div class="card" style="border-color:var(--green-300);border-width:2px">
+        <div style="display:flex;align-items:center;gap:12px;margin-bottom:1.25rem">
+          <div style="width:44px;height:44px;border-radius:var(--radius-md);background:var(--green-100);display:flex;align-items:center;justify-content:center;font-size:22px">🔬</div>
+          <div>
+            <div style="font-weight:700;font-size:1.1rem;color:var(--gray-900)">ResNet50</div>
+            <div style="font-size:0.75rem;color:var(--gray-400)">Deep Residual Learning</div>
+          </div>
+          <span style="margin-left:auto;background:var(--green-100);color:var(--green-800);font-size:0.7rem;font-weight:600;padding:3px 10px;border-radius:var(--radius-full)">🏆 Terbaik</span>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem">
+          <div style="background:var(--green-50);border-radius:var(--radius-md);padding:0.875rem;border:1px solid var(--green-100)">
+            <div style="font-size:0.7rem;color:var(--green-600);margin-bottom:4px">Accuracy</div>
+            <div style="font-size:1.4rem;font-weight:700;color:var(--green-600)">93.7%</div>
+          </div>
+          <div style="background:var(--green-50);border-radius:var(--radius-md);padding:0.875rem;border:1px solid var(--green-100)">
+            <div style="font-size:0.7rem;color:var(--green-600);margin-bottom:4px">F1-Score</div>
+            <div style="font-size:1.4rem;font-weight:700;color:var(--green-600)">93.3%</div>
+          </div>
+          <div style="background:var(--green-50);border-radius:var(--radius-md);padding:0.875rem;border:1px solid var(--green-100)">
+            <div style="font-size:0.7rem;color:var(--green-600);margin-bottom:4px">Model Size</div>
+            <div style="font-size:1.2rem;font-weight:600;color:var(--green-700)">~98 MB</div>
+          </div>
+          <div style="background:var(--green-50);border-radius:var(--radius-md);padding:0.875rem;border:1px solid var(--green-100)">
+            <div style="font-size:0.7rem;color:var(--green-600);margin-bottom:4px">Training Time</div>
+            <div style="font-size:1.2rem;font-weight:600;color:var(--green-700)">~18 min</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Bar Chart -->
+    <div class="chart-wrap mb-6">
+      <div class="card-title">📊 Perbandingan Metrik Evaluasi</div>
+      <canvas id="compare-chart" height="120"></canvas>
+    </div>
+
+    <!-- Detailed Comparison Table -->
+    <div class="card mb-6">
+      <div class="card-title">📋 Tabel Perbandingan Lengkap</div>
+      <div style="overflow-x:auto">
+        <table class="compare-table">
+          <thead>
+            <tr>
+              <th>Metrik / Aspek</th>
+              <th>VGG16</th>
+              <th>ResNet50</th>
+              <th>Selisih</th>
+              <th>Unggul</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td>Accuracy</td><td>92.4%</td><td style="font-weight:600;color:var(--green-600)">93.7%</td><td>+1.3%</td><td><span class="badge-win">ResNet50</span></td></tr>
+            <tr><td>Precision</td><td>92.1%</td><td style="font-weight:600;color:var(--green-600)">93.4%</td><td>+1.3%</td><td><span class="badge-win">ResNet50</span></td></tr>
+            <tr><td>Recall</td><td>91.8%</td><td style="font-weight:600;color:var(--green-600)">93.1%</td><td>+1.3%</td><td><span class="badge-win">ResNet50</span></td></tr>
+            <tr><td>F1-Score</td><td>92.0%</td><td style="font-weight:600;color:var(--green-600)">93.3%</td><td>+1.3%</td><td><span class="badge-win">ResNet50</span></td></tr>
+            <tr><td>Model Size</td><td style="color:#D85A30;font-weight:600">~527 MB</td><td>~98 MB</td><td>-429 MB</td><td><span class="badge-win">ResNet50</span></td></tr>
+            <tr><td>Training Time</td><td style="color:#D85A30;font-weight:600">~32 menit</td><td>~18 menit</td><td>-14 min</td><td><span class="badge-win">ResNet50</span></td></tr>
+            <tr><td>Parameters</td><td style="color:#D85A30;font-weight:600">138.4 M</td><td>25.6 M</td><td>-112.8 M</td><td><span class="badge-win">ResNet50</span></td></tr>
+            <tr><td>Depth (Layers)</td><td>16</td><td>50</td><td>+34</td><td><span style="font-size:0.75rem;color:var(--gray-500)">Berbeda</span></td></tr>
+            <tr><td>Skip Connection</td><td>❌ Tidak</td><td style="font-weight:600;color:var(--green-600)">✅ Ya</td><td>-</td><td><span class="badge-win">ResNet50</span></td></tr>
+            <tr><td>Batch Norm</td><td>❌ Tidak</td><td style="font-weight:600;color:var(--green-600)">✅ Ya</td><td>-</td><td><span class="badge-win">ResNet50</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Radar / Summary -->
+    <div class="card">
+      <div class="card-title">📝 Kesimpulan Perbandingan</div>
+      <div style="font-size:0.9375rem;color:var(--gray-600);line-height:1.8">
+        <p style="margin-bottom:1rem">
+          Berdasarkan hasil eksperimen, <strong>ResNet50</strong> secara konsisten mengungguli VGG16 pada semua metrik evaluasi untuk tugas klasifikasi kematangan buah pisang.
+        </p>
+        <p style="margin-bottom:1rem">
+          Keunggulan ResNet50 berasal dari arsitektur <em>residual connection</em> (skip connection) yang memungkinkan gradient mengalir lebih efektif selama backpropagation, sehingga model dapat belajar fitur yang lebih kompleks dengan lebih sedikit parameter.
+        </p>
+        <p>
+          Selain akurasi yang lebih tinggi, ResNet50 juga memiliki ukuran model yang jauh lebih kecil (~98 MB vs ~527 MB) dan waktu training yang lebih singkat (~18 vs ~32 menit), menjadikannya pilihan yang lebih efisien untuk deployment.
+        </p>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<div id="toast-container" class="toast-container"></div>
+<script src="{{ url_for('static', filename='js/script.js') }}"></script>
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  const dark = document.documentElement.getAttribute('data-theme')==='dark';
+  const textColor = dark?'#A8A59E':'#5C5A55';
+  const gridColor = dark?'rgba(255,255,255,0.06)':'rgba(0,0,0,0.05)';
+  const ctx = document.getElementById('compare-chart')?.getContext('2d');
+  if(!ctx) return;
+  new Chart(ctx,{
+    type:'bar',
+    data:{
+      labels:['Accuracy','Precision','Recall','F1-Score'],
+      datasets:[
+        {label:'VGG16',data:[0.924,0.921,0.918,0.920],backgroundColor:'#F5C518CC',borderRadius:6},
+        {label:'ResNet50',data:[0.937,0.934,0.931,0.933],backgroundColor:'#4CAF72CC',borderRadius:6}
+      ]
+    },
+    options:{
+      responsive:true,
+      plugins:{
+        legend:{labels:{color:textColor,font:{family:'DM Sans',size:12}}},
+        tooltip:{backgroundColor:'#1A1917',titleColor:'#FAF9F7',bodyColor:'#A8A59E',cornerRadius:8,padding:10,callbacks:{label:c=>c.dataset.label+': '+(c.raw*100).toFixed(1)+'%'}}
+      },
+      scales:{
+        x:{grid:{color:gridColor},ticks:{color:textColor}},
+        y:{min:0.88,max:1,grid:{color:gridColor},ticks:{color:textColor,callback:v=>(v*100).toFixed(0)+'%'}}
+      }
+    }
+  });
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="id" data-theme="light">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Training Model – BananaDetect</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js" defer></script>
+</head>
+<body>
+<nav class="navbar">
+  <a href="/" class="navbar-brand"><div class="brand-icon">🍌</div><span>BananaDetect</span></a>
+  <div class="navbar-right">
+    <button class="btn-theme sidebar-toggle" id="sidebar-toggle">☰</button>
+    <button class="btn-theme" id="theme-toggle">🌙</button>
+  </div>
+</nav>
+<div class="sidebar-overlay" id="sidebar-overlay"></div>
+<div class="app-layout">
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-section">
+      <div class="sidebar-label">Menu Utama</div>
+      <ul class="sidebar-nav">
+        <li><a href="/dashboard"><span class="nav-icon">📊</span> Dashboard</a></li>
+        <li><a href="/predict"><span class="nav-icon">🍌</span> Prediksi</a></li>
+        <li><a href="/training" class="active"><span class="nav-icon">🏋️</span> Training Model</a></li>
+        <li><a href="/evaluation"><span class="nav-icon">📈</span> Evaluasi</a></li>
+        <li><a href="/comparison"><span class="nav-icon">⚖️</span> Perbandingan</a></li>
+      </ul>
+    </div>
+    <div class="sidebar-section">
+      <div class="sidebar-label">Informasi</div>
+      <ul class="sidebar-nav">
+        <li><a href="/about"><span class="nav-icon">📖</span> Tentang Riset</a></li>
+        <li><a href="/"><span class="nav-icon">🏠</span> Beranda</a></li>
+      </ul>
+    </div>
+  </aside>
+
+  <main class="main-content">
+    <div class="page-header">
+      <h1>Training Model</h1>
+      <p>Kurva pembelajaran dan statistik proses training VGG16 & ResNet50.</p>
+    </div>
+
+    <!-- Model Switch -->
+    <div class="model-tabs mb-6">
+      <button class="model-tab active" onclick="switchModel('resnet50',this)">ResNet50</button>
+      <button class="model-tab" onclick="switchModel('vgg16',this)">VGG16</button>
+    </div>
+
+    <!-- Training Config -->
+    <div class="stat-grid mb-6">
+      <div class="stat-card">
+        <div class="stat-label">Epoch</div>
+        <div class="stat-value">20</div>
+        <div class="stat-delta">Iterasi Training</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Batch Size</div>
+        <div class="stat-value">32</div>
+        <div class="stat-delta">Adam Optimizer</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Learning Rate</div>
+        <div class="stat-value" style="font-size:1.25rem">1e-4</div>
+        <div class="stat-delta">Categorical CE Loss</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Final Val. Acc</div>
+        <div class="stat-value" id="final-acc">92.1%</div>
+        <div class="stat-delta up" id="final-delta">↑ ResNet50</div>
+      </div>
+    </div>
+
+    <!-- Training Progress Bar (visual) -->
+    <div class="card mb-6">
+      <div class="card-title">⏱️ Progress Training</div>
+      <div style="display:flex;justify-content:space-between;font-size:0.8rem;color:var(--gray-400);margin-bottom:0.5rem">
+        <span>Epoch 0</span>
+        <span id="epoch-progress-text">Epoch 20 / 20</span>
+        <span>Epoch 20</span>
+      </div>
+      <div class="training-progress-bar">
+        <div class="training-progress-fill" id="epoch-bar" style="width:100%"></div>
+      </div>
+      <div style="display:flex;gap:1.5rem;margin-top:1rem;flex-wrap:wrap">
+        <div style="font-size:0.8rem;color:var(--gray-500)">Status: <span style="color:var(--green-500);font-weight:600">✓ Selesai</span></div>
+        <div style="font-size:0.8rem;color:var(--gray-500)">Durasi: <span style="font-weight:500;color:var(--gray-700)" id="duration-text">~18 menit</span></div>
+        <div style="font-size:0.8rem;color:var(--gray-500)">Hardware: <span style="font-weight:500;color:var(--gray-700)">GPU / CPU</span></div>
+      </div>
+    </div>
+
+    <!-- CHARTS -->
+    <div class="grid-2 mb-6">
+      <div class="chart-wrap">
+        <div class="metric-chips">
+          <div class="metric-chip"><div class="chip-dot" style="background:#F5C518"></div> Train Accuracy</div>
+          <div class="metric-chip"><div class="chip-dot" style="background:#4CAF72"></div> Val Accuracy</div>
+        </div>
+        <canvas id="acc-chart" height="220"></canvas>
+      </div>
+      <div class="chart-wrap">
+        <div class="metric-chips">
+          <div class="metric-chip"><div class="chip-dot" style="background:#D85A30"></div> Train Loss</div>
+          <div class="metric-chip"><div class="chip-dot" style="background:#378ADD"></div> Val Loss</div>
+        </div>
+        <canvas id="loss-chart" height="220"></canvas>
+      </div>
+    </div>
+
+    <!-- Per-Epoch Table -->
+    <div class="card">
+      <div class="card-title">📋 Tabel Hasil Per Epoch</div>
+      <div style="overflow-x:auto">
+        <table class="compare-table" id="epoch-table">
+          <thead>
+            <tr>
+              <th>Epoch</th>
+              <th>Train Acc</th>
+              <th>Val Acc</th>
+              <th>Train Loss</th>
+              <th>Val Loss</th>
+            </tr>
+          </thead>
+          <tbody id="epoch-tbody"></tbody>
+        </table>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<div id="toast-container" class="toast-container"></div>
+<script src="{{ url_for('static', filename='js/script.js') }}"></script>
+<script>
+const trainingData = {
+  resnet50: {
+    finalAcc: '92.1%', delta: '↑ ResNet50', duration: '~18 menit',
+    acc:  { train: [0.42,0.58,0.67,0.74,0.79,0.82,0.84,0.86,0.87,0.88,0.89,0.90,0.91,0.91,0.92,0.92,0.93,0.93,0.94,0.94],
+            val:   [0.38,0.55,0.63,0.71,0.77,0.80,0.82,0.84,0.85,0.86,0.87,0.88,0.88,0.89,0.89,0.90,0.90,0.91,0.91,0.92] },
+    loss: { train: [1.12,0.95,0.82,0.70,0.61,0.54,0.48,0.43,0.39,0.35,0.32,0.29,0.27,0.25,0.24,0.22,0.21,0.20,0.19,0.18],
+            val:   [1.18,1.00,0.88,0.76,0.66,0.59,0.53,0.48,0.44,0.40,0.37,0.34,0.32,0.30,0.28,0.26,0.25,0.23,0.22,0.21] }
+  },
+  vgg16: {
+    finalAcc: '90.3%', delta: '↑ VGG16', duration: '~32 menit',
+    acc:  { train: [0.38,0.52,0.62,0.70,0.75,0.79,0.81,0.83,0.84,0.85,0.86,0.87,0.88,0.88,0.89,0.89,0.90,0.90,0.91,0.91],
+            val:   [0.35,0.50,0.60,0.67,0.73,0.77,0.79,0.81,0.82,0.83,0.84,0.85,0.85,0.86,0.86,0.87,0.87,0.88,0.88,0.90] },
+    loss: { train: [1.18,1.02,0.88,0.76,0.67,0.59,0.53,0.48,0.44,0.40,0.37,0.34,0.31,0.29,0.27,0.25,0.23,0.22,0.21,0.20],
+            val:   [1.22,1.06,0.92,0.80,0.70,0.62,0.56,0.51,0.47,0.43,0.40,0.37,0.34,0.32,0.30,0.28,0.27,0.25,0.24,0.22] }
+  }
+};
+
+let charts = {};
+
+function buildEpochTable(data) {
+  const tbody = document.getElementById('epoch-tbody');
+  if (!tbody) return;
+  tbody.innerHTML = data.acc.train.map((_, i) => `
+    <tr>
+      <td>${i+1}</td>
+      <td>${(data.acc.train[i]*100).toFixed(1)}%</td>
+      <td style="color:var(--green-600);font-weight:500">${(data.acc.val[i]*100).toFixed(1)}%</td>
+      <td>${data.loss.train[i].toFixed(4)}</td>
+      <td style="color:var(--yellow-600)">${data.loss.val[i].toFixed(4)}</td>
+    </tr>
+  `).join('');
+}
+
+function switchModel(key, btn) {
+  document.querySelectorAll('.model-tab').forEach(t => t.classList.remove('active'));
+  btn.classList.add('active');
+
+  const d = trainingData[key];
+  document.getElementById('final-acc').textContent = d.finalAcc;
+  document.getElementById('final-delta').textContent = d.delta;
+  document.getElementById('duration-text').textContent = d.duration;
+
+  const labels = Array.from({length:20},(_,i)=>i+1);
+  const c = getChartColors();
+
+  if (charts.acc) charts.acc.destroy();
+  if (charts.loss) charts.loss.destroy();
+
+  const accCtx = document.getElementById('acc-chart').getContext('2d');
+  charts.acc = new Chart(accCtx, {
+    type:'line', data:{labels,datasets:[
+      {label:'Train Acc',data:d.acc.train,borderColor:c.yellow,backgroundColor:'transparent',pointRadius:3,tension:0.4},
+      {label:'Val Acc',data:d.acc.val,borderColor:c.green,backgroundColor:'transparent',pointRadius:3,tension:0.4,borderDash:[5,3]}
+    ]}, options:{...defaultChartOpts(), scales:{x:{grid:{color:c.grid},ticks:{color:c.text}},y:{grid:{color:c.grid},ticks:{color:c.text,callback:v=>(v*100).toFixed(0)+'%'},min:0,max:1}}}
+  });
+
+  const lossCtx = document.getElementById('loss-chart').getContext('2d');
+  charts.loss = new Chart(lossCtx, {
+    type:'line', data:{labels,datasets:[
+      {label:'Train Loss',data:d.loss.train,borderColor:c.coral,backgroundColor:'transparent',pointRadius:3,tension:0.4},
+      {label:'Val Loss',data:d.loss.val,borderColor:c.blue,backgroundColor:'transparent',pointRadius:3,tension:0.4,borderDash:[5,3]}
+    ]}, options:defaultChartOpts()
+  });
+
+  buildEpochTable(d);
+}
+
+function getChartColors() {
+  const dark = document.documentElement.getAttribute('data-theme')==='dark';
+  return {text:dark?'#A8A59E':'#5C5A55',grid:dark?'rgba(255,255,255,0.06)':'rgba(0,0,0,0.05)',
+    yellow:'#F5C518',green:'#4CAF72',coral:'#D85A30',blue:'#378ADD'};
+}
+function defaultChartOpts() {
+  const c=getChartColors();
+  return {responsive:true,plugins:{legend:{labels:{color:c.text,font:{family:'DM Sans',size:12}}},tooltip:{backgroundColor:'#1A1917',titleColor:'#FAF9F7',bodyColor:'#A8A59E',borderColor:'#302E2A',borderWidth:1,cornerRadius:8,padding:10}}};
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  switchModel('resnet50', document.querySelector('.model-tab.active'));
+});
+</script>
+</body>
+</html>

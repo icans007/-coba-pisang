@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="id" data-theme="light">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Tentang Riset – BananaDetect</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+<nav class="navbar">
+  <a href="/" class="navbar-brand"><div class="brand-icon">🍌</div><span>BananaDetect</span></a>
+  <div class="navbar-right">
+    <button class="btn-theme sidebar-toggle" id="sidebar-toggle">☰</button>
+    <button class="btn-theme" id="theme-toggle">🌙</button>
+  </div>
+</nav>
+<div class="sidebar-overlay" id="sidebar-overlay"></div>
+<div class="app-layout">
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-section">
+      <div class="sidebar-label">Menu Utama</div>
+      <ul class="sidebar-nav">
+        <li><a href="/dashboard"><span class="nav-icon">📊</span> Dashboard</a></li>
+        <li><a href="/predict"><span class="nav-icon">🍌</span> Prediksi</a></li>
+        <li><a href="/training"><span class="nav-icon">🏋️</span> Training Model</a></li>
+        <li><a href="/evaluation"><span class="nav-icon">📈</span> Evaluasi</a></li>
+        <li><a href="/comparison"><span class="nav-icon">⚖️</span> Perbandingan</a></li>
+      </ul>
+    </div>
+    <div class="sidebar-section">
+      <div class="sidebar-label">Informasi</div>
+      <ul class="sidebar-nav">
+        <li><a href="/about" class="active"><span class="nav-icon">📖</span> Tentang Riset</a></li>
+        <li><a href="/"><span class="nav-icon">🏠</span> Beranda</a></li>
+      </ul>
+    </div>
+  </aside>
+
+  <main class="main-content">
+    <div class="page-header">
+      <h1>Tentang Penelitian</h1>
+      <p>BananaDetect – Sistem Klasifikasi Tingkat Kematangan Buah Pisang Menggunakan ResNet50 dan VGG16.</p>
+    </div>
+
+    <div style="display:grid;grid-template-columns:1fr 280px;gap:2rem;align-items:start" class="about-grid">
+      <!-- Main Content -->
+      <div class="research-section">
+
+        <h2>📌 Latar Belakang</h2>
+        <p>
+          Buah pisang (<em>Musa paradisiaca</em>) merupakan salah satu komoditas hortikultura terpenting di Indonesia. Penentuan tingkat kematangan pisang secara manual memerlukan keahlian khusus dan rentan terhadap kesalahan subjektif. Proses ini juga membutuhkan waktu yang tidak efisien dalam skala industri.
+        </p>
+        <p>
+          Kemajuan teknologi Deep Learning, khususnya Convolutional Neural Network (CNN), membuka peluang besar untuk otomasi klasifikasi kematangan buah berdasarkan citra digital. Pendekatan ini dapat meningkatkan efisiensi, konsistensi, dan akurasi penilaian kematangan pisang.
+        </p>
+
+        <h2>🎯 Tujuan Penelitian</h2>
+        <ul class="step-list">
+          <li><div><strong>Membangun sistem klasifikasi</strong> tingkat kematangan pisang berbasis Deep Learning yang akurat dan dapat diimplementasikan secara praktis.</div></li>
+          <li><div><strong>Membandingkan performa</strong> dua arsitektur CNN populer (VGG16 dan ResNet50) menggunakan metode transfer learning pada dataset pisang.</div></li>
+          <li><div><strong>Mengembangkan pipeline preprocessing</strong> gambar yang optimal termasuk ekstraksi fitur warna RGB, HSV, dan tekstur GLCM.</div></li>
+          <li><div><strong>Menyediakan aplikasi web</strong> berbasis Flask untuk prediksi kematangan pisang secara real-time.</div></li>
+        </ul>
+
+        <h2>🧪 Metode Penelitian</h2>
+        <p>Penelitian ini menggunakan pendekatan <strong>Transfer Learning</strong> dengan dua tahap utama:</p>
+        <ul class="step-list">
+          <li><div><strong>Feature Extraction:</strong> Menggunakan bobot pre-trained ImageNet pada layer konvolusi untuk mengekstrak fitur visual umum dari gambar pisang.</div></li>
+          <li><div><strong>Fine-tuning:</strong> Melatih ulang classifier head (GlobalAveragePooling → Dense 256 → Dropout → Softmax 3) dengan dataset pisang spesifik.</div></li>
+        </ul>
+
+        <h2>🧠 Convolutional Neural Network (CNN)</h2>
+        <p>
+          CNN adalah arsitektur jaringan saraf tiruan yang dirancang khusus untuk memproses data grid seperti gambar. CNN terdiri dari tiga jenis layer utama:
+        </p>
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:1rem;margin:1rem 0">
+          <div style="padding:1rem;background:var(--yellow-50);border-radius:var(--radius-md);border:1px solid var(--yellow-100)">
+            <div style="font-weight:600;color:var(--yellow-800);margin-bottom:0.5rem;font-size:0.875rem">Convolutional Layer</div>
+            <div style="font-size:0.8rem;color:var(--yellow-700);line-height:1.6">Mengekstrak fitur lokal seperti tepi, tekstur, dan pola menggunakan filter/kernel.</div>
+          </div>
+          <div style="padding:1rem;background:var(--green-50);border-radius:var(--radius-md);border:1px solid var(--green-100)">
+            <div style="font-weight:600;color:var(--green-800);margin-bottom:0.5rem;font-size:0.875rem">Pooling Layer</div>
+            <div style="font-size:0.8rem;color:var(--green-700);line-height:1.6">Mengurangi dimensi feature map sambil mempertahankan informasi penting (downsampling).</div>
+          </div>
+          <div style="padding:1rem;background:var(--gray-50);border-radius:var(--radius-md);border:1px solid var(--gray-100)">
+            <div style="font-weight:600;color:var(--gray-700);margin-bottom:0.5rem;font-size:0.875rem">Fully Connected Layer</div>
+            <div style="font-size:0.8rem;color:var(--gray-600);line-height:1.6">Menggabungkan seluruh fitur untuk klasifikasi final menggunakan fungsi aktivasi Softmax.</div>
+          </div>
+        </div>
+
+        <h2>🔄 Transfer Learning</h2>
+        <p>
+          Transfer learning adalah teknik memanfaatkan pengetahuan yang telah dipelajari dari tugas/dataset besar (ImageNet – 1.2 juta gambar, 1000 kelas) untuk menyelesaikan tugas yang berbeda namun berkaitan. Pendekatan ini sangat efektif ketika dataset target relatif kecil.
+        </p>
+        <div style="background:var(--gray-25);border-radius:var(--radius-lg);padding:1.25rem;border:1px solid var(--gray-100);margin:1rem 0;font-family:monospace;font-size:0.82rem;line-height:2;color:var(--gray-600)">
+          ImageNet (1.2M img) → Pre-trained Weights → VGG16/ResNet50<br>
+          → Freeze Base Layers → Add Custom Head → Fine-tune → Banana Dataset
+        </div>
+
+        <h2>🗂️ Dataset</h2>
+        <p>
+          Dataset yang digunakan adalah <strong>Banana Classification Dataset</strong> dari Kaggle (atrithakar), terdiri dari 963 gambar pisang yang terbagi dalam 3 kategori kematangan.
+        </p>
+        <div style="overflow-x:auto;margin:1rem 0">
+          <table class="compare-table">
+            <thead><tr><th>Kelas</th><th>Jumlah</th><th>Train</th><th>Val</th><th>Test</th><th>Keterangan</th></tr></thead>
+            <tbody>
+              <tr><td><span class="result-label-tag unripe" style="font-size:.75rem;padding:3px 10px">Unripe</span></td><td>320</td><td>224</td><td>48</td><td>48</td><td style="color:var(--gray-500)">Pisang hijau / belum matang</td></tr>
+              <tr><td><span class="result-label-tag ripe" style="font-size:.75rem;padding:3px 10px">Ripe</span></td><td>315</td><td>220</td><td>48</td><td>47</td><td style="color:var(--gray-500)">Pisang kuning / matang optimal</td></tr>
+              <tr><td><span class="result-label-tag overripe" style="font-size:.75rem;padding:3px 10px">Overripe</span></td><td>328</td><td>230</td><td>49</td><td>49</td><td style="color:var(--gray-500)">Pisang coklat / terlalu matang</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h2>🛠️ Teknologi yang Digunakan</h2>
+        <div class="tech-stack">
+          <span class="tech-badge">🐍 Python 3.10</span>
+          <span class="tech-badge">🧠 TensorFlow 2.x</span>
+          <span class="tech-badge">⚡ Keras</span>
+          <span class="tech-badge">🌐 Flask</span>
+          <span class="tech-badge">👁️ OpenCV</span>
+          <span class="tech-badge">🔢 NumPy</span>
+          <span class="tech-badge">📊 Matplotlib</span>
+          <span class="tech-badge">📐 Scikit-learn</span>
+          <span class="tech-badge">📦 Bootstrap 5</span>
+          <span class="tech-badge">📈 Chart.js</span>
+        </div>
+
+      </div>
+
+      <!-- Sidebar Info -->
+      <div style="position:sticky;top:calc(var(--navbar-h) + 1.5rem)">
+        <!-- Research Info Card -->
+        <div class="card mb-4">
+          <div class="card-title">📋 Info Penelitian</div>
+          <table style="width:100%;font-size:0.85rem;border-collapse:collapse">
+            <tr><td style="color:var(--gray-400);padding:7px 0;border-bottom:1px solid var(--gray-50)">Judul</td></tr>
+            <tr><td style="font-size:0.8rem;color:var(--gray-700);padding:7px 0 12px;border-bottom:1px solid var(--gray-50);line-height:1.5">Klasifikasi Kematangan Buah Pisang Menggunakan ResNet50 dan VGG16</td></tr>
+            <tr><td style="color:var(--gray-400);padding:7px 0;border-bottom:1px solid var(--gray-50)">Dataset</td></tr>
+            <tr><td style="color:var(--gray-700);padding:7px 0 12px;border-bottom:1px solid var(--gray-50)">Banana Classification (Kaggle)</td></tr>
+            <tr><td style="color:var(--gray-400);padding:7px 0;border-bottom:1px solid var(--gray-50)">Metode</td></tr>
+            <tr><td style="color:var(--gray-700);padding:7px 0 12px;border-bottom:1px solid var(--gray-50)">Transfer Learning + CNN</td></tr>
+            <tr><td style="color:var(--gray-400);padding:7px 0;border-bottom:1px solid var(--gray-50)">Framework</td></tr>
+            <tr><td style="color:var(--gray-700);padding:7px 0 12px;border-bottom:1px solid var(--gray-50)">TensorFlow / Keras</td></tr>
+            <tr><td style="color:var(--gray-400);padding:7px 0">Akurasi Terbaik</td></tr>
+            <tr><td style="color:var(--green-600);font-weight:700;padding:7px 0;font-size:1.2rem">93.7% (ResNet50)</td></tr>
+          </table>
+        </div>
+
+        <!-- Quick Links -->
+        <div class="card">
+          <div class="card-title">🔗 Tautan</div>
+          <div style="display:flex;flex-direction:column;gap:8px">
+            <a href="https://www.kaggle.com/datasets/atrithakar/banana-classification" target="_blank" class="btn btn-outline btn-sm" style="justify-content:center">📦 Dataset Kaggle</a>
+            <a href="/predict" class="btn btn-accent btn-sm" style="justify-content:center">🍌 Coba Prediksi</a>
+            <a href="/comparison" class="btn btn-outline btn-sm" style="justify-content:center">⚖️ Lihat Perbandingan</a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<div id="toast-container" class="toast-container"></div>
+<script src="{{ url_for('static', filename='js/script.js') }}"></script>
+<style>
+@media (max-width:900px){.about-grid{grid-template-columns:1fr!important}}
+</style>
+</body>
+</html>

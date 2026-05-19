@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="id" data-theme="light">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Dashboard – BananaDetect</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js" defer></script>
+</head>
+<body>
+
+<!-- NAVBAR -->
+<nav class="navbar">
+  <a href="/" class="navbar-brand">
+    <div class="brand-icon">🍌</div>
+    <span>BananaDetect</span>
+  </a>
+  <div class="navbar-right">
+    <button class="btn-theme sidebar-toggle" id="sidebar-toggle">☰</button>
+    <button class="btn-theme" id="theme-toggle" title="Toggle Theme">🌙</button>
+    <a href="/predict" class="btn btn-accent btn-sm">Coba Sekarang</a>
+  </div>
+</nav>
+
+<div class="sidebar-overlay" id="sidebar-overlay"></div>
+
+<!-- APP LAYOUT -->
+<div class="app-layout">
+  <!-- SIDEBAR -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-section">
+      <div class="sidebar-label">Menu Utama</div>
+      <ul class="sidebar-nav">
+        <li><a href="/dashboard" class="active"><span class="nav-icon">📊</span> Dashboard</a></li>
+        <li><a href="/predict"><span class="nav-icon">🍌</span> Prediksi</a></li>
+        <li><a href="/training"><span class="nav-icon">🏋️</span> Training Model</a></li>
+        <li><a href="/evaluation"><span class="nav-icon">📈</span> Evaluasi</a></li>
+        <li><a href="/comparison"><span class="nav-icon">⚖️</span> Perbandingan</a></li>
+      </ul>
+    </div>
+    <div class="sidebar-section">
+      <div class="sidebar-label">Informasi</div>
+      <ul class="sidebar-nav">
+        <li><a href="/about"><span class="nav-icon">📖</span> Tentang Riset</a></li>
+        <li><a href="/"><span class="nav-icon">🏠</span> Beranda</a></li>
+      </ul>
+    </div>
+    <!-- Dataset Info Card -->
+    <div style="margin:1.5rem 0.75rem;padding:1rem;background:var(--yellow-50);border:1px solid var(--yellow-200);border-radius:var(--radius-lg)">
+      <div style="font-size:0.75rem;font-weight:600;color:var(--yellow-800);margin-bottom:0.5rem">Dataset</div>
+      <div style="font-size:0.8rem;color:var(--yellow-700);line-height:1.5">
+        Kaggle · Banana Classification<br>
+        963 Gambar · 3 Kelas
+      </div>
+    </div>
+  </aside>
+
+  <!-- MAIN CONTENT -->
+  <main class="main-content">
+    <div class="page-header">
+      <h1>Dashboard</h1>
+      <p>Ringkasan statistik dataset dan informasi penelitian BananaDetect.</p>
+      <div class="page-header-actions">
+        <a href="/predict" class="btn btn-accent btn-sm">+ Prediksi Baru</a>
+        <a href="https://www.kaggle.com/datasets/atrithakar/banana-classification" target="_blank" class="btn btn-outline btn-sm">Unduh Dataset</a>
+      </div>
+    </div>
+
+    <!-- STAT CARDS -->
+    <div class="stat-grid">
+      <div class="stat-card">
+        <div class="stat-label">Total Dataset</div>
+        <div class="stat-value" data-count="963">963</div>
+        <div class="stat-delta up">↑ Gambar Pisang</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Kelas Kategori</div>
+        <div class="stat-value">3</div>
+        <div class="stat-delta">Unripe · Ripe · Overripe</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Akurasi Terbaik</div>
+        <div class="stat-value">93.7%</div>
+        <div class="stat-delta up">↑ ResNet50</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Epoch Training</div>
+        <div class="stat-value">20</div>
+        <div class="stat-delta">Batch Size 32</div>
+      </div>
+    </div>
+
+    <!-- CHARTS ROW -->
+    <div class="grid-2 mb-6">
+      <div class="chart-wrap">
+        <div class="card-title">📦 Distribusi Dataset</div>
+        <canvas id="dataset-chart" height="220"></canvas>
+      </div>
+      <div class="chart-wrap">
+        <div class="card-title">📊 Perbandingan Jumlah Kelas</div>
+        <canvas id="class-bar-chart" height="220"></canvas>
+      </div>
+    </div>
+
+    <!-- DATASET BREAKDOWN TABLE -->
+    <div class="card mb-6">
+      <div class="card-title">🗂️ Rincian Dataset</div>
+      <table class="compare-table">
+        <thead>
+          <tr>
+            <th>Kategori</th>
+            <th>Jumlah Gambar</th>
+            <th>Persentase</th>
+            <th>Train Split</th>
+            <th>Val Split</th>
+            <th>Test Split</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><span class="result-label-tag unripe" style="font-size:.75rem;padding:3px 10px">Unripe</span></td>
+            <td style="font-weight:600">320</td>
+            <td>33.2%</td>
+            <td>224</td>
+            <td>48</td>
+            <td>48</td>
+          </tr>
+          <tr>
+            <td><span class="result-label-tag ripe" style="font-size:.75rem;padding:3px 10px">Ripe</span></td>
+            <td style="font-weight:600">315</td>
+            <td>32.7%</td>
+            <td>220</td>
+            <td>48</td>
+            <td>47</td>
+          </tr>
+          <tr>
+            <td><span class="result-label-tag overripe" style="font-size:.75rem;padding:3px 10px">Overripe</span></td>
+            <td style="font-weight:600">328</td>
+            <td>34.1%</td>
+            <td>230</td>
+            <td>49</td>
+            <td>49</td>
+          </tr>
+          <tr style="font-weight:600;background:var(--gray-25)">
+            <td>Total</td>
+            <td>963</td>
+            <td>100%</td>
+            <td>674</td>
+            <td>145</td>
+            <td>144</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- DATASET PREVIEW GALLERY -->
+    <div class="card mb-6">
+      <div class="card-title">🖼️ Preview Dataset (Representatif)</div>
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:1.5rem">
+        <!-- Unripe -->
+        <div>
+          <div style="font-size:0.8rem;font-weight:600;color:var(--green-700);margin-bottom:0.75rem;display:flex;align-items:center;gap:6px">
+            <span style="width:8px;height:8px;border-radius:50%;background:var(--green-400);display:inline-block"></span>
+            Unripe (Mentah)
+          </div>
+          <div class="dataset-grid">
+            {% for i in range(6) %}
+            <div class="dataset-thumb">🌿</div>
+            {% endfor %}
+          </div>
+        </div>
+        <!-- Ripe -->
+        <div>
+          <div style="font-size:0.8rem;font-weight:600;color:var(--yellow-700);margin-bottom:0.75rem;display:flex;align-items:center;gap:6px">
+            <span style="width:8px;height:8px;border-radius:50%;background:var(--yellow-400);display:inline-block"></span>
+            Ripe (Matang)
+          </div>
+          <div class="dataset-grid">
+            {% for i in range(6) %}
+            <div class="dataset-thumb">🍌</div>
+            {% endfor %}
+          </div>
+        </div>
+        <!-- Overripe -->
+        <div>
+          <div style="font-size:0.8rem;font-weight:600;color:#7A3520;margin-bottom:0.75rem;display:flex;align-items:center;gap:6px">
+            <span style="width:8px;height:8px;border-radius:50%;background:#D85A30;display:inline-block"></span>
+            Overripe (Sangat Matang)
+          </div>
+          <div class="dataset-grid">
+            {% for i in range(6) %}
+            <div class="dataset-thumb">🍂</div>
+            {% endfor %}
+          </div>
+        </div>
+      </div>
+      <div style="margin-top:1rem;padding-top:1rem;border-top:1px solid var(--gray-100);font-size:0.8rem;color:var(--gray-400)">
+        💡 Untuk preview gambar nyata, tambahkan gambar sampel ke folder <code>static/images/samples/</code>
+      </div>
+    </div>
+
+    <!-- MODEL SUMMARY -->
+    <div class="grid-2">
+      <div class="card">
+        <div class="card-title">🏛️ VGG16 – Ringkasan</div>
+        <table style="width:100%;font-size:0.85rem;border-collapse:collapse">
+          <tr><td style="color:var(--gray-500);padding:6px 0;border-bottom:1px solid var(--gray-50)">Input Size</td><td style="font-weight:500;text-align:right;border-bottom:1px solid var(--gray-50)">224 × 224 × 3</td></tr>
+          <tr><td style="color:var(--gray-500);padding:6px 0;border-bottom:1px solid var(--gray-50)">Base Model</td><td style="font-weight:500;text-align:right;border-bottom:1px solid var(--gray-50)">VGG16 (ImageNet)</td></tr>
+          <tr><td style="color:var(--gray-500);padding:6px 0;border-bottom:1px solid var(--gray-50)">Dense Layer</td><td style="font-weight:500;text-align:right;border-bottom:1px solid var(--gray-50)">256 ReLU</td></tr>
+          <tr><td style="color:var(--gray-500);padding:6px 0;border-bottom:1px solid var(--gray-50)">Dropout</td><td style="font-weight:500;text-align:right;border-bottom:1px solid var(--gray-50)">0.5</td></tr>
+          <tr><td style="color:var(--gray-500);padding:6px 0;border-bottom:1px solid var(--gray-50)">Output</td><td style="font-weight:500;text-align:right;border-bottom:1px solid var(--gray-50)">3 Kelas Softmax</td></tr>
+          <tr><td style="color:var(--gray-500);padding:6px 0">Akurasi Test</td><td style="font-weight:700;color:var(--yellow-600);text-align:right">92.4%</td></tr>
+        </table>
+      </div>
+      <div class="card">
+        <div class="card-title">🔬 ResNet50 – Ringkasan</div>
+        <table style="width:100%;font-size:0.85rem;border-collapse:collapse">
+          <tr><td style="color:var(--gray-500);padding:6px 0;border-bottom:1px solid var(--gray-50)">Input Size</td><td style="font-weight:500;text-align:right;border-bottom:1px solid var(--gray-50)">224 × 224 × 3</td></tr>
+          <tr><td style="color:var(--gray-500);padding:6px 0;border-bottom:1px solid var(--gray-50)">Base Model</td><td style="font-weight:500;text-align:right;border-bottom:1px solid var(--gray-50)">ResNet50 (ImageNet)</td></tr>
+          <tr><td style="color:var(--gray-500);padding:6px 0;border-bottom:1px solid var(--gray-50)">Dense Layer</td><td style="font-weight:500;text-align:right;border-bottom:1px solid var(--gray-50)">256 ReLU</td></tr>
+          <tr><td style="color:var(--gray-500);padding:6px 0;border-bottom:1px solid var(--gray-50)">Dropout</td><td style="font-weight:500;text-align:right;border-bottom:1px solid var(--gray-50)">0.5</td></tr>
+          <tr><td style="color:var(--gray-500);padding:6px 0;border-bottom:1px solid var(--gray-50)">Output</td><td style="font-weight:500;text-align:right;border-bottom:1px solid var(--gray-50)">3 Kelas Softmax</td></tr>
+          <tr><td style="color:var(--gray-500);padding:6px 0">Akurasi Test</td><td style="font-weight:700;color:var(--green-600);text-align:right">93.7%</td></tr>
+        </table>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<div id="toast-container" class="toast-container"></div>
+<script src="{{ url_for('static', filename='js/script.js') }}"></script>
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+  const textColor = isDark ? '#A8A59E' : '#5C5A55';
+  const gridColor = isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.05)';
+
+  // Class bar chart
+  const barCtx = document.getElementById('class-bar-chart')?.getContext('2d');
+  if (barCtx) {
+    new Chart(barCtx, {
+      type: 'bar',
+      data: {
+        labels: ['Unripe', 'Ripe', 'Overripe'],
+        datasets: [{
+          label: 'Jumlah Gambar',
+          data: [320, 315, 328],
+          backgroundColor: ['#4CAF72CC', '#F5C518CC', '#D85A30CC'],
+          borderRadius: 8, borderWidth: 0
+        }]
+      },
+      options: {
+        responsive: true,
+        plugins: {
+          legend: { display: false },
+          tooltip: { backgroundColor: '#1A1917', titleColor: '#FAF9F7', bodyColor: '#A8A59E', cornerRadius: 8, padding: 10 }
+        },
+        scales: {
+          x: { grid: { color: gridColor }, ticks: { color: textColor } },
+          y: { grid: { color: gridColor }, ticks: { color: textColor }, min: 300 }
+        }
+      }
+    });
+  }
+});
+</script>
+</body>
+</html>

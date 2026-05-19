@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="id" data-theme="light">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>BananaDetect – Klasifikasi Kematangan Buah Pisang</title>
+  <meta name="description" content="Sistem AI klasifikasi tingkat kematangan buah pisang menggunakan ResNet50 dan VGG16 dengan Transfer Learning.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js" defer></script>
+</head>
+<body>
+
+<!-- ── NAVBAR ── -->
+<nav class="navbar">
+  <a href="/" class="navbar-brand">
+    <div class="brand-icon">🍌</div>
+    <span>BananaDetect</span>
+  </a>
+  <ul class="navbar-nav">
+    <li><a href="/">Beranda</a></li>
+    <li><a href="/dashboard">Dashboard</a></li>
+    <li><a href="/predict">Prediksi</a></li>
+    <li><a href="/training">Training</a></li>
+    <li><a href="/evaluation">Evaluasi</a></li>
+    <li><a href="/about">Tentang</a></li>
+  </ul>
+  <div class="navbar-right">
+    <button class="btn-theme" id="theme-toggle" title="Toggle Theme">🌙</button>
+    <a href="/predict" class="btn btn-accent btn-sm">Coba Sekarang</a>
+  </div>
+</nav>
+
+<!-- ── HERO ── -->
+<section class="hero">
+  <div class="hero-bg"></div>
+  <div class="hero-content">
+    <div class="hero-badge">
+      <span>🔬</span> Penelitian Deep Learning – Skripsi 2024
+    </div>
+    <h1 class="hero-title">
+      Klasifikasi Kematangan<br>
+      <span>Buah Pisang</span> dengan AI
+    </h1>
+    <p class="hero-subtitle">
+      BananaDetect menggunakan arsitektur ResNet50 dan VGG16 dengan metode transfer learning untuk mendeteksi tingkat kematangan buah pisang dari citra gambar secara akurat dan real-time.
+    </p>
+    <div class="hero-cta">
+      <a href="/predict" class="btn btn-primary btn-lg">
+        <span>🚀</span> Mulai Deteksi
+      </a>
+      <a href="/dashboard" class="btn btn-outline btn-lg">
+        <span>📊</span> Lihat Dashboard
+      </a>
+    </div>
+
+    <!-- Mini Stats -->
+    <div style="display:flex;gap:2rem;justify-content:center;margin-top:3rem;flex-wrap:wrap">
+      <div style="text-align:center">
+        <div style="font-size:1.75rem;font-weight:700;color:var(--gray-900)">93.7%</div>
+        <div style="font-size:0.8rem;color:var(--gray-400);margin-top:2px">Akurasi ResNet50</div>
+      </div>
+      <div style="width:1px;background:var(--gray-100)"></div>
+      <div style="text-align:center">
+        <div style="font-size:1.75rem;font-weight:700;color:var(--gray-900)">92.4%</div>
+        <div style="font-size:0.8rem;color:var(--gray-400);margin-top:2px">Akurasi VGG16</div>
+      </div>
+      <div style="width:1px;background:var(--gray-100)"></div>
+      <div style="text-align:center">
+        <div style="font-size:1.75rem;font-weight:700;color:var(--gray-900)">963</div>
+        <div style="font-size:0.8rem;color:var(--gray-400);margin-top:2px">Total Dataset</div>
+      </div>
+      <div style="width:1px;background:var(--gray-100)"></div>
+      <div style="text-align:center">
+        <div style="font-size:1.75rem;font-weight:700;color:var(--gray-900)">3</div>
+        <div style="font-size:0.8rem;color:var(--gray-400);margin-top:2px">Kategori Kelas</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Hero Mockup -->
+  <div class="hero-mockup container">
+    <div style="border-radius:var(--radius-xl);overflow:hidden;border:1px solid var(--gray-100);box-shadow:var(--shadow-lg)">
+      <div class="mockup-bar">
+        <div class="mockup-dot"></div>
+        <div class="mockup-dot"></div>
+        <div class="mockup-dot"></div>
+        <div style="flex:1;height:20px;background:var(--gray-100);border-radius:var(--radius-full);margin:0 12px;opacity:0.6"></div>
+      </div>
+      <!-- Mini dashboard preview inside hero -->
+      <div style="display:grid;grid-template-columns:200px 1fr;background:var(--gray-25);min-height:320px">
+        <div style="background:var(--gray-0);border-right:1px solid var(--gray-100);padding:1rem">
+          <div style="display:flex;align-items:center;gap:8px;padding:8px 10px;background:var(--yellow-100);border-radius:var(--radius-md);margin-bottom:6px">
+            <span style="font-size:16px">🍌</span>
+            <span style="font-size:0.8rem;font-weight:600;color:var(--yellow-800)">Prediksi</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:8px;padding:8px 10px;border-radius:var(--radius-md);margin-bottom:6px">
+            <span style="font-size:16px">📊</span>
+            <span style="font-size:0.8rem;color:var(--gray-500)">Dashboard</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:8px;padding:8px 10px;border-radius:var(--radius-md)">
+            <span style="font-size:16px">📈</span>
+            <span style="font-size:0.8rem;color:var(--gray-500)">Evaluasi</span>
+          </div>
+        </div>
+        <div style="padding:1.5rem">
+          <div style="font-size:1rem;font-weight:600;color:var(--gray-900);margin-bottom:1rem">Hasil Prediksi</div>
+          <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:1rem">
+            <div style="background:var(--green-50);border:1px solid var(--green-100);border-radius:var(--radius-md);padding:10px;text-align:center">
+              <div style="font-size:1.2rem;font-weight:700;color:var(--green-600)">Unripe</div>
+              <div style="font-size:0.7rem;color:var(--green-500)">Mentah</div>
+            </div>
+            <div style="background:var(--yellow-50);border:2px solid var(--yellow-400);border-radius:var(--radius-md);padding:10px;text-align:center">
+              <div style="font-size:1.2rem;font-weight:700;color:var(--yellow-600)">Ripe</div>
+              <div style="font-size:0.7rem;color:var(--yellow-500)">94.2%</div>
+            </div>
+            <div style="background:var(--gray-50);border:1px solid var(--gray-100);border-radius:var(--radius-md);padding:10px;text-align:center">
+              <div style="font-size:1.2rem;font-weight:700;color:var(--gray-500)">Overripe</div>
+              <div style="font-size:0.7rem;color:var(--gray-400)">Terlalu Matang</div>
+            </div>
+          </div>
+          <div style="background:var(--gray-0);border:1px solid var(--gray-100);border-radius:var(--radius-md);padding:1rem">
+            <div style="font-size:0.75rem;color:var(--gray-500);margin-bottom:8px">Confidence Score</div>
+            <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px">
+              <span style="font-size:0.75rem;width:60px;color:var(--gray-600)">Unripe</span>
+              <div style="flex:1;height:6px;background:var(--gray-100);border-radius:999px"><div style="width:4%;height:100%;background:var(--green-400);border-radius:999px"></div></div>
+              <span style="font-size:0.75rem;color:var(--gray-700)">4%</span>
+            </div>
+            <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px">
+              <span style="font-size:0.75rem;width:60px;color:var(--gray-600)">Ripe</span>
+              <div style="flex:1;height:6px;background:var(--gray-100);border-radius:999px"><div style="width:94%;height:100%;background:var(--yellow-400);border-radius:999px"></div></div>
+              <span style="font-size:0.75rem;color:var(--gray-700)">94%</span>
+            </div>
+            <div style="display:flex;align-items:center;gap:10px">
+              <span style="font-size:0.75rem;width:60px;color:var(--gray-600)">Overripe</span>
+              <div style="flex:1;height:6px;background:var(--gray-100);border-radius:999px"><div style="width:2%;height:100%;background:#D85A30;border-radius:999px"></div></div>
+              <span style="font-size:0.75rem;color:var(--gray-700)">2%</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="hero-scroll">
+    <span>↓</span>
+    <span>Scroll</span>
+  </div>
+</section>
+
+<!-- ── FEATURES ── -->
+<section class="section" style="background:var(--gray-0)">
+  <div class="container">
+    <div class="text-center mb-8">
+      <div class="section-label">Fitur Sistem</div>
+      <h2 class="section-title">Teknologi AI Terkini</h2>
+      <p class="section-subtitle" style="margin:0 auto">
+        Dibangun dengan arsitektur deep learning state-of-the-art dan preprocessing gambar yang komprehensif.
+      </p>
+    </div>
+    <div class="features-grid">
+      <div class="feature-card">
+        <div class="feature-icon yellow">🧠</div>
+        <h3>Transfer Learning ResNet50</h3>
+        <p>Memanfaatkan model ResNet50 pre-trained ImageNet dengan fine-tuning untuk klasifikasi kematangan pisang dengan akurasi hingga 93.7%.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon yellow">🏗️</div>
+        <h3>VGG16 Deep Architecture</h3>
+        <p>Arsitektur VGG16 yang terbukti robust untuk tugas klasifikasi citra, dioptimasi dengan dropout dan dense layer khusus.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon green">🖼️</div>
+        <h3>RGB + HSV Preprocessing</h3>
+        <p>Pipeline preprocessing lengkap: resize 224×224, normalisasi RGB, konversi HSV, dan ekstraksi fitur tekstur GLCM.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon green">🔄</div>
+        <h3>Data Augmentation</h3>
+        <p>Augmentasi dataset otomatis: rotation, zoom, horizontal flip, dan brightness adjustment untuk meningkatkan generalisasi model.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon yellow">📊</div>
+        <h3>Evaluasi Komprehensif</h3>
+        <p>Laporan evaluasi lengkap: accuracy, precision, recall, F1-score, confusion matrix, dan perbandingan antar model.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon green">⚡</div>
+        <h3>Prediksi Real-time</h3>
+        <p>Upload gambar dan dapatkan hasil klasifikasi instan beserta confidence score untuk setiap kategori kematangan.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── CATEGORIES ── -->
+<section class="section">
+  <div class="container">
+    <div class="flex items-center justify-between mb-8" style="flex-wrap:wrap;gap:1rem">
+      <div>
+        <div class="section-label">Dataset</div>
+        <h2 class="section-title">Kategori Kematangan</h2>
+      </div>
+      <a href="https://www.kaggle.com/datasets/atrithakar/banana-classification" target="_blank" class="btn btn-outline btn-sm">
+        Lihat Dataset Kaggle →
+      </a>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:1.5rem">
+      <!-- Unripe -->
+      <div class="card" style="border-color:var(--green-200)">
+        <div style="width:48px;height:48px;border-radius:var(--radius-lg);background:var(--green-100);display:flex;align-items:center;justify-content:center;font-size:26px;margin-bottom:1rem">🌿</div>
+        <div style="display:inline-flex;align-items:center;gap:6px;background:var(--green-100);color:var(--green-800);padding:4px 12px;border-radius:var(--radius-full);font-size:0.8rem;font-weight:600;margin-bottom:0.75rem">Unripe</div>
+        <h3 style="font-size:1.1rem;font-weight:600;color:var(--gray-900);margin-bottom:0.5rem">Pisang Mentah</h3>
+        <p style="font-size:0.875rem;color:var(--gray-500);line-height:1.6">Pisang berwarna hijau dengan tekstur keras. Pati belum terkonversi menjadi gula. Tidak siap dikonsumsi langsung.</p>
+        <div style="margin-top:1rem;padding-top:1rem;border-top:1px solid var(--gray-100);display:flex;justify-content:space-between">
+          <span style="font-size:0.75rem;color:var(--gray-400)">Jumlah gambar</span>
+          <span style="font-size:0.875rem;font-weight:600;color:var(--gray-700)">320 foto</span>
+        </div>
+      </div>
+      <!-- Ripe -->
+      <div class="card" style="border-color:var(--yellow-200)">
+        <div style="width:48px;height:48px;border-radius:var(--radius-lg);background:var(--yellow-100);display:flex;align-items:center;justify-content:center;font-size:26px;margin-bottom:1rem">🍌</div>
+        <div style="display:inline-flex;align-items:center;gap:6px;background:var(--yellow-100);color:var(--yellow-800);padding:4px 12px;border-radius:var(--radius-full);font-size:0.8rem;font-weight:600;margin-bottom:0.75rem">Ripe</div>
+        <h3 style="font-size:1.1rem;font-weight:600;color:var(--gray-900);margin-bottom:0.5rem">Pisang Matang</h3>
+        <p style="font-size:0.875rem;color:var(--gray-500);line-height:1.6">Pisang berwarna kuning cerah, tekstur lembut dan manis. Karbohidrat terkonversi sempurna. Siap dikonsumsi.</p>
+        <div style="margin-top:1rem;padding-top:1rem;border-top:1px solid var(--gray-100);display:flex;justify-content:space-between">
+          <span style="font-size:0.75rem;color:var(--gray-400)">Jumlah gambar</span>
+          <span style="font-size:0.875rem;font-weight:600;color:var(--gray-700)">315 foto</span>
+        </div>
+      </div>
+      <!-- Overripe -->
+      <div class="card" style="border-color:#F0997B">
+        <div style="width:48px;height:48px;border-radius:var(--radius-lg);background:#FAECE7;display:flex;align-items:center;justify-content:center;font-size:26px;margin-bottom:1rem">🍂</div>
+        <div style="display:inline-flex;align-items:center;gap:6px;background:#FAECE7;color:#7A3520;padding:4px 12px;border-radius:var(--radius-full);font-size:0.8rem;font-weight:600;margin-bottom:0.75rem">Overripe</div>
+        <h3 style="font-size:1.1rem;font-weight:600;color:var(--gray-900);margin-bottom:0.5rem">Pisang Terlalu Matang</h3>
+        <p style="font-size:0.875rem;color:var(--gray-500);line-height:1.6">Pisang berwarna coklat dengan bintik hitam. Tekstur sangat lembek. Cocok untuk olahan makanan seperti kue.</p>
+        <div style="margin-top:1rem;padding-top:1rem;border-top:1px solid var(--gray-100);display:flex;justify-content:space-between">
+          <span style="font-size:0.75rem;color:var(--gray-400)">Jumlah gambar</span>
+          <span style="font-size:0.875rem;font-weight:600;color:var(--gray-700)">328 foto</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── MODEL ARCHITECTURE ── -->
+<section class="section" style="background:var(--gray-0)">
+  <div class="container">
+    <div class="text-center mb-8">
+      <div class="section-label">Arsitektur</div>
+      <h2 class="section-title">Model Deep Learning</h2>
+    </div>
+    <div class="grid-2">
+      <div class="card">
+        <div style="display:flex;align-items:center;gap:12px;margin-bottom:1.25rem">
+          <div style="width:40px;height:40px;border-radius:var(--radius-md);background:var(--yellow-100);display:flex;align-items:center;justify-content:center;font-size:20px">🏛️</div>
+          <div>
+            <div style="font-weight:600;color:var(--gray-900)">VGG16</div>
+            <div style="font-size:0.75rem;color:var(--gray-400)">Transfer Learning</div>
+          </div>
+          <span style="margin-left:auto;font-size:1.2rem;font-weight:700;color:var(--yellow-600)">92.4%</span>
+        </div>
+        <div style="font-size:0.8rem;color:var(--gray-500);line-height:2;font-family:monospace;background:var(--gray-25);padding:1rem;border-radius:var(--radius-md);border:1px solid var(--gray-100)">
+          VGG16(weights='imagenet', include_top=False)<br>
+          → GlobalAveragePooling2D()<br>
+          → Dense(256, activation='relu')<br>
+          → Dropout(0.5)<br>
+          → Dense(3, activation='softmax')
+        </div>
+      </div>
+      <div class="card">
+        <div style="display:flex;align-items:center;gap:12px;margin-bottom:1.25rem">
+          <div style="width:40px;height:40px;border-radius:var(--radius-md);background:var(--green-100);display:flex;align-items:center;justify-content:center;font-size:20px">🔬</div>
+          <div>
+            <div style="font-weight:600;color:var(--gray-900)">ResNet50</div>
+            <div style="font-size:0.75rem;color:var(--gray-400)">Transfer Learning</div>
+          </div>
+          <span style="margin-left:auto;font-size:1.2rem;font-weight:700;color:var(--green-600)">93.7%</span>
+        </div>
+        <div style="font-size:0.8rem;color:var(--gray-500);line-height:2;font-family:monospace;background:var(--gray-25);padding:1rem;border-radius:var(--radius-md);border:1px solid var(--gray-100)">
+          ResNet50(weights='imagenet', include_top=False)<br>
+          → GlobalAveragePooling2D()<br>
+          → Dense(256, activation='relu')<br>
+          → Dropout(0.5)<br>
+          → Dense(3, activation='softmax')
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── CTA SECTION ── -->
+<section class="section">
+  <div class="container">
+    <div style="background:var(--gray-900);border-radius:var(--radius-xl);padding:4rem 3rem;text-align:center;position:relative;overflow:hidden">
+      <div style="position:absolute;top:-60px;right:-60px;width:240px;height:240px;border-radius:50%;background:rgba(245,197,24,0.08)"></div>
+      <div style="position:absolute;bottom:-40px;left:-40px;width:180px;height:180px;border-radius:50%;background:rgba(76,175,114,0.06)"></div>
+      <div style="position:relative;z-index:1">
+        <div style="font-size:2.5rem;margin-bottom:1rem">🍌</div>
+        <h2 style="font-family:var(--font-serif);font-size:2rem;color:#FAF9F7;margin-bottom:0.75rem">Mulai Klasifikasi Sekarang</h2>
+        <p style="color:#888680;font-size:0.95rem;max-width:480px;margin:0 auto 2rem;line-height:1.7">Upload foto pisang dan biarkan AI menentukan tingkat kematangannya dalam hitungan detik.</p>
+        <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap">
+          <a href="/predict" class="btn btn-accent btn-lg">🚀 Coba Deteksi</a>
+          <a href="/about" class="btn btn-ghost btn-lg" style="color:#888680;border-color:#302E2A">Pelajari Lebih Lanjut</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── FOOTER ── -->
+<footer class="footer">
+  <div class="footer-inner">
+    <div>
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:0.5rem">
+        <div class="brand-icon">🍌</div>
+        <span style="font-weight:600;color:var(--gray-800)">BananaDetect</span>
+      </div>
+      <p class="footer-copy">Sistem Klasifikasi Kematangan Buah Pisang · ResNet50 & VGG16</p>
+    </div>
+    <div class="footer-links">
+      <a href="/dashboard">Dashboard</a>
+      <a href="/predict">Prediksi</a>
+      <a href="/training">Training</a>
+      <a href="/evaluation">Evaluasi</a>
+      <a href="/about">Tentang</a>
+    </div>
+    <p class="footer-copy">© 2024 BananaDetect · Tugas Akhir / Skripsi</p>
+  </div>
+</footer>
+
+<div id="toast-container" class="toast-container"></div>
+<script src="{{ url_for('static', filename='js/script.js') }}"></script>
+</body>
+</html>
